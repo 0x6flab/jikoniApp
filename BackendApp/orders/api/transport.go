@@ -25,6 +25,7 @@ const (
 	totalKey    = "total"
 	nameKey     = "name"
 	priceKey    = "price"
+	placeKey    = "place"
 	statusKey   = "status"
 )
 
@@ -104,6 +105,7 @@ func decodeListOrders(_ context.Context, r *http.Request) (interface{}, error) {
 	var total = uint64(100)
 	var price = uint64(0)
 	var name = ""
+	var place = ""
 	var status = ""
 	var err error
 
@@ -134,6 +136,9 @@ func decodeListOrders(_ context.Context, r *http.Request) (interface{}, error) {
 	if r.URL.Query().Has(nameKey) {
 		name = r.URL.Query().Get(nameKey)
 	}
+	if r.URL.Query().Has(placeKey) {
+		place = r.URL.Query().Get(placeKey)
+	}
 	if r.URL.Query().Has(statusKey) {
 		status = r.URL.Query().Get(statusKey)
 	}
@@ -144,6 +149,7 @@ func decodeListOrders(_ context.Context, r *http.Request) (interface{}, error) {
 		total:  total,
 		name:   name,
 		price:  price,
+		place:  place,
 		status: status,
 	}
 	return req, nil

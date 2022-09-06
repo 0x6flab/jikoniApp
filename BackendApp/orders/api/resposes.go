@@ -80,8 +80,9 @@ type viewOrderRes struct {
 	ID        string          `json:"id"`
 	Name      string          `json:"name"`
 	Price     uint64          `json:"price,omitempty"`
-	Metadata  orders.Metadata `json:"metadata,omitempty"`
+	Place     string          `json:"place,omitempty"`
 	Status    string          `json:"status,omitempty"`
+	Metadata  orders.Metadata `json:"metadata,omitempty"`
 	UpdatedAt time.Time       `json:"updated_at,omitempty"`
 	CreatedAt time.Time       `json:"created_at,omitempty"`
 }
