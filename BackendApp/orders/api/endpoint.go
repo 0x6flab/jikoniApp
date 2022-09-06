@@ -40,6 +40,7 @@ func viewOrderEndpoint(svc orders.OrderService) endpoint.Endpoint {
 			ID:        order.ID,
 			Name:      order.Name,
 			Price:     order.Price,
+			Place:     order.Place,
 			Metadata:  order.Metadata,
 			Status:    order.Status,
 			CreatedAt: order.CreatedAt,
@@ -60,6 +61,7 @@ func listOrdersEndpoint(svc orders.OrderService) endpoint.Endpoint {
 			Total:  req.total,
 			Name:   req.name,
 			Price:  req.price,
+			Place:  req.place,
 			Status: req.status,
 		}
 		up, err := svc.ListOrders(ctx, req.token, pm)
@@ -80,6 +82,7 @@ func updateOrderEndpoint(svc orders.OrderService) endpoint.Endpoint {
 			ID:       req.id,
 			Name:     req.Name,
 			Price:    req.Price,
+			Place:    req.Place,
 			Status:   req.Status,
 			Metadata: req.Metadata,
 		}
@@ -118,6 +121,7 @@ func buildOrdersResponse(op orders.OrdersPage) ordersPageRes {
 			ID:        order.ID,
 			Name:      order.Name,
 			Price:     order.Price,
+			Place:     order.Place,
 			Status:    order.Status,
 			Metadata:  order.Metadata,
 			CreatedAt: order.CreatedAt,

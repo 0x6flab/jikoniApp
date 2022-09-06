@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/oklog/ulid/v2"
 )
 
 // PageMetadata contains page metadata that helps navigation.
@@ -14,6 +14,7 @@ type PageMetadata struct {
 	Limit    uint64
 	Name     string
 	Price    uint64
+	Place    string
 	Metadata Metadata
 	Status   string
 }
@@ -41,14 +42,10 @@ func (svc orderService) CreateOrder(ctx context.Context, token string, order Ord
 	if err := order.Validate(); err != nil {
 		return "", err
 	}
-	uid, err := svc.generateUUID()
-	if err != nil {
-		return "", err
-	}
-	order.ID = uid
+	order.ID = ulid.Make().String()
 	order.CreatedAt = time.Now()
 	order.UpdatedAt = time.Now()
-	uid, err = svc.orders.Save(ctx, order)
+	uid, err := svc.orders.Save(ctx, order)
 	if err != nil {
 		return "", err
 	}
@@ -68,6 +65,8 @@ func (svc orderService) UpdateOrder(ctx context.Context, token string, order Ord
 		ID:        order.ID,
 		Name:      order.Name,
 		Price:     order.Price,
+		Place:     order.Place,
+		Status:    order.Status,
 		Metadata:  order.Metadata,
 		UpdatedAt: time.Now(),
 	}
@@ -76,12 +75,4 @@ func (svc orderService) UpdateOrder(ctx context.Context, token string, order Ord
 
 func (svc orderService) DeleteOrder(ctx context.Context, token string, id string) error {
 	return svc.orders.Delete(ctx, id)
-}
-
-func (svc orderService) generateUUID() (string, error) {
-	id, err := uuid.NewV4()
-	if err != nil {
-		return "", err
-	}
-	return id.String(), nil
 }

@@ -40,6 +40,7 @@ type listOrdersReq struct {
 	token  string
 	name   string
 	price  uint64
+	place  string
 	status string
 	offset uint64
 	limit  uint64
@@ -61,6 +62,7 @@ type updateOrderReq struct {
 	id       string
 	Name     string          `json:"name,omitempty"`
 	Price    uint64          `json:"price,omitempty"`
+	Place    string          `json:"place,omitempty"`
 	Status   string          `json:"status,omitempty"`
 	Metadata orders.Metadata `json:"metadata,omitempty"`
 }

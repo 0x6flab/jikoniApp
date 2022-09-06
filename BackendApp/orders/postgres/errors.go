@@ -1,7 +1,7 @@
-package cockroach
+package postgres
 
 import (
-	oerr "github.com/0x6flab/jikoniApp/BackendApp/orders"
+	"github.com/0x6flab/jikoniApp/BackendApp/internal/errors"
 	"github.com/jackc/pgconn"
 	"go.uber.org/multierr"
 )
@@ -20,11 +20,11 @@ func handleError(err, wrapper error) error {
 	if ok {
 		switch pqErr.Code {
 		case errDuplicate:
-			return multierr.Combine(oerr.ErrConflict, err)
+			return multierr.Combine(errors.ErrConflict, err)
 		case errInvalid, errTruncation:
-			return multierr.Combine(oerr.ErrMalformedEntity, err)
+			return multierr.Combine(errors.ErrMalformedEntity, err)
 		case errFK:
-			return multierr.Combine(oerr.ErrCreateEntity, err)
+			return multierr.Combine(errors.ErrCreateEntity, err)
 		}
 	}
 	return multierr.Combine(wrapper, err)
