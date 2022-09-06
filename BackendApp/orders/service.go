@@ -13,7 +13,7 @@ type PageMetadata struct {
 	Offset   uint64
 	Limit    uint64
 	Name     string
-	Price    string
+	Price    uint64
 	Metadata Metadata
 	Status   string
 }
