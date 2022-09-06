@@ -1,0 +1,4 @@
+FROM scratch
+ARG SVC
+COPY jikoni-$SVC /exe
+ENTRYPOINT ["/exe"]
