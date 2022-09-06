@@ -4,6 +4,12 @@ package errors
 // to distinguish and log API request validation errors and avoid that service
 // errors are logged twice.
 var (
+	// ErrInvalidStatus indicated an invalid order status
+	ErrInvalidStatus = New("invalid order status")
+
+	// ErrInvalidPlace indicated an invalid order place
+	ErrInvalidPlace = New("invalid order place")
+
 	// ErrAuthentication indicates failure occurred while authenticating the entity.
 	ErrAuthentication = New("failed to perform authentication over the entity")
 
