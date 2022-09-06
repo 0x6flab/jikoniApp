@@ -76,7 +76,7 @@ func (repo orderRepo) RetrieveAll(ctx context.Context, pm orders.PageMetadata) (
 	if pm.Name != "" {
 		query = append(query, fmt.Sprintf("name = '%s'", pm.Name))
 	}
-	if pm.Price != "" {
+	if pm.Price != 0 {
 		query = append(query, fmt.Sprintf("price = '%s'", pm.Price))
 	}
 	if pm.Status != "" {

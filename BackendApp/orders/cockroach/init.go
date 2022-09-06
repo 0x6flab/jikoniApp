@@ -2,7 +2,6 @@ package cockroach
 
 import (
 	"database/sql"
-	"fmt"
 
 	"contrib.go.opencensus.io/integrations/ocsql"
 	_ "github.com/jackc/pgx/v4/stdlib" // required for SQL access
@@ -10,25 +9,10 @@ import (
 	migrate "github.com/rubenv/sql-migrate"
 )
 
-// Config defines the options that are used when connecting to a PostgreSQL instance.
-type Config struct {
-	Host        string
-	Port        string
-	User        string
-	Pass        string
-	Name        string
-	SSLMode     string
-	SSLCert     string
-	SSLKey      string
-	SSLRootCert string
-}
-
 // Connect creates a connection to the PostgreSQL instance and applies any
 // unappeased database migrations. A non-nil error is returned to indicate
 // failure.
-func Connect(cfg Config) (*sqlx.DB, error) {
-	url := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s sslcert=%s sslkey=%s sslrootcert=%s",
-		cfg.Host, cfg.Port, cfg.User, cfg.Name, cfg.Pass, cfg.SSLMode, cfg.SSLCert, cfg.SSLKey, cfg.SSLRootCert)
+func Connect(url string) (*sqlx.DB, error) {
 
 	// Register default views.
 	ocsql.RegisterAllViews()
