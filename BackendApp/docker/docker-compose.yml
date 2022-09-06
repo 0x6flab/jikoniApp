@@ -5,112 +5,52 @@ networks:
     driver: bridge
 
 volumes:
-  0x6flab-jikoni-roach-0-volume:
-  0x6flab-jikoni-roach-1-volume:
-  0x6flab-jikoni-roach-client-volume:
-  0x6flab-jikoni-grafana-volume:
+  0x6flab-jikoni-db-volume:
+
 
 services:
-  # jikoni-roach-cert:
-  #   build: roach-cert
-  #   container_name: jikoni-roach-cert
-  #   hostname: jikoni-roach-cert
-  #   restart: on-failure
-  #   networks:
-  #     - 0x6flab-jikoni-base-net
-  #   volumes:
-  #     - 0x6flab-jikoni-roach-0-volume:/certs/jikoni-roach-0
-  #     - 0x6flab-jikoni-roach-1-volume:/certs/jikoni-roach-1
-  #     - 0x6flab-jikoni-roach-client-volume:/certs/jikoni-roach-client
-
-  jikoni-roach-0:
-    image: cockroachdb/cockroach:latest
-    container_name: jikoni-roach-0
-    hostname: jikoni-roach-0
-    restart: on-failure
-    # depends_on:
-    #   - jikoni-roach-cert
-    networks:
-      - 0x6flab-jikoni-base-net    
-    volumes:
-      - 0x6flab-jikoni-roach-0-volume:/certs
-    command: start --insecure --join=jikoni-roach-0,jikoni-roach-1 --listen-addr=jikoni-roach-0:26257 --advertise-addr=jikoni-roach-0:26257 --http-addr=jikoni-roach-0:8080
-    # command: start --certs-dir=/certs --join=jikoni-roach-0,jikoni-roach-1 --listen-addr=jikoni-roach-0:26257 --advertise-addr=jikoni-roach-0:26257 --http-addr=jikoni-roach-0:8080
-
-  jikoni-roach-1:
-    image: cockroachdb/cockroach:latest
-    container_name: jikoni-roach-1
-    hostname: jikoni-roach-1
+  jikoni-db:
+    image: postgres:13.3-alpine
+    container_name: 0x6flab-jikoni-db
     restart: on-failure
     depends_on:
-      # - jikoni-roach-cert
-      - jikoni-roach-0
-    networks:
-      - 0x6flab-jikoni-base-net         
-    volumes:
-      - 0x6flab-jikoni-roach-1-volume:/certs
-    command: start --insecure --join=jikoni-roach-0,jikoni-roach-1 --listen-addr=jikoni-roach-1:26257 --advertise-addr=jikoni-roach-1:26257 --http-addr=jikoni-roach-1:8080
-    # command: start --certs-dir=/certs --join=jikoni-roach-0,jikoni-roach-1 --listen-addr=jikoni-roach-1:26257 --advertise-addr=jikoni-roach-1:26257 --http-addr=jikoni-roach-1:8080
-
-  jikoni-roach-init:
-    image: cockroachdb/cockroach:latest
-    container_name: jikoni-roach-init
-    hostname: jikoni-roach-init
-    depends_on:
-      # - jikoni-roach-cert
-      - jikoni-roach-0
-    networks:
-      - 0x6flab-jikoni-base-net         
-    volumes:
-      - 0x6flab-jikoni-roach-client-volume:/certs
-    command: init --host=jikoni-roach-0 --insecure
-
-    # command: init --host=jikoni-roach-0 --certs-dir=/certs
-
-  jikoni-roach-lb:
-    image: haproxy
-    container_name: jikoni-roach-lb
-    hostname: jikoni-roach-lb
-    restart: on-failure
-    depends_on:
-      - jikoni-roach-0
-      - jikoni-roach-1
-    networks:
-      - 0x6flab-jikoni-base-net         
+      - jikoni-zipkin
+    environment:
+      POSTGRES_USER: ${JIKONI_DB_USER}
+      POSTGRES_PASSWORD: ${JIKONI_DB_PASS}
+      POSTGRES_DB: ${JIKONI_DB}
     ports:
-      - "26000:26257"
-      - "8080:8080"
-      - "8081:8081"
-    volumes:
-      - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
-
-  jikoni-roach-client:
-    image: cockroachdb/cockroach:latest
-    container_name: jikoni-roach-client
-    hostname: jikoni-roach-client
-    restart: on-failure
-    depends_on:
-      - jikoni-roach-lb
+      - ${JIKONI_DB_PORT}:${JIKONI_DB_PORT}
+    expose:
+      - ${JIKONI_DB_PORT}
     networks:
-      - 0x6flab-jikoni-base-net         
-    entrypoint: ["tail", "-f", "/dev/null"]
+      - 0x6flab-jikoni-base-net
     volumes:
-      - 0x6flab-jikoni-roach-client-volume:/certs
+      - 0x6flab-jikoni-db-volume:/var/lib/postgresql/data
+    command: -p ${JIKONI_DB_PORT}
 
   jikoni-orders:
     image: rodneydav/jikoni-orders:${JIKONI_RELEASE_TAG}
     container_name: jikoni-orders
     restart: on-failure
     depends_on:
-      - jikoni-roach-lb
+      - jikoni-db
       - jikoni-zipkin
     environment:
       JIKONI_LOG_LEVEL: ${JIKONI_LOG_LEVEL}
-      JIKONI_DB_URL: ${JIKONI_DB_URL}
+      JIKONI_DB_HOST: ${JIKONI_DB_HOST}
+      JIKONI_DB_PORT: ${JIKONI_DB_PORT}
+      JIKONI_DB_USER: ${JIKONI_DB_USER}
+      JIKONI_DB_PASS: ${JIKONI_DB_PASS}
+      JIKONI_DB: ${JIKONI_DB}
+      JIKONI_DB_SSL_MODE: ${JIKONI_DB_SSL_MODE}
+      JIKONI_DB_SSL_CERT: ${JIKONI_DB_SSL_CERT}
+      JIKONI_DB_SSL_KEY: ${JIKONI_DB_SSL_KEY}
+      JIKONI_DB_SSL_ROOT_CERT: ${JIKONI_DB_SSL_ROOT_CERT}
       JIKONI_HTTP_PORT: ${JIKONI_HTTP_PORT}
       JIKONI_SERVER_CERT: ${JIKONI_SERVER_CERT}
       JIKONI_SERVER_KEY: ${JIKONI_SERVER_KEY}
-      JIKONI_JAEGER_URL: ${JIKONI_JAEGER_URL}
+      JIKONI_ZIPKIN_URL: ${JIKONI_ZIPKIN_URL}
     ports:
       - ${JIKONI_HTTP_PORT}:${JIKONI_HTTP_PORT}
     expose:
