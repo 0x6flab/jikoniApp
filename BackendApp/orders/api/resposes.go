@@ -78,6 +78,7 @@ func (res createOrderRes) Empty() bool {
 
 type viewOrderRes struct {
 	ID        string          `json:"id"`
+	Vendor    string          `json:"vendor"`
 	Name      string          `json:"name"`
 	Price     uint64          `json:"price,omitempty"`
 	Place     string          `json:"place,omitempty"`

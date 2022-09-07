@@ -23,6 +23,7 @@ const (
 	offsetKey   = "offset"
 	limitKey    = "limit"
 	totalKey    = "total"
+	vendorKey   = "vendor"
 	nameKey     = "name"
 	priceKey    = "price"
 	placeKey    = "place"
@@ -104,6 +105,7 @@ func decodeListOrders(_ context.Context, r *http.Request) (interface{}, error) {
 	var limit = uint64(100)
 	var total = uint64(100)
 	var price = uint64(0)
+	var vendor = ""
 	var name = ""
 	var place = ""
 	var status = ""
@@ -133,6 +135,9 @@ func decodeListOrders(_ context.Context, r *http.Request) (interface{}, error) {
 			return nil, err
 		}
 	}
+	if r.URL.Query().Has(vendorKey) {
+		vendor = r.URL.Query().Get(vendorKey)
+	}
 	if r.URL.Query().Has(nameKey) {
 		name = r.URL.Query().Get(nameKey)
 	}
@@ -147,6 +152,7 @@ func decodeListOrders(_ context.Context, r *http.Request) (interface{}, error) {
 		offset: offset,
 		limit:  limit,
 		total:  total,
+		vendor: vendor,
 		name:   name,
 		price:  price,
 		place:  place,

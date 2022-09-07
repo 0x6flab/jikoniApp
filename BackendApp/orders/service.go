@@ -12,6 +12,7 @@ type PageMetadata struct {
 	Total    uint64
 	Offset   uint64
 	Limit    uint64
+	Vendor   string
 	Name     string
 	Price    uint64
 	Place    string

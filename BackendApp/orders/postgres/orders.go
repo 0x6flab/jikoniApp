@@ -29,8 +29,8 @@ func NewOrderRepo(db *sqlx.DB) orders.OrderRepository {
 }
 
 func (repo orderRepo) Save(ctx context.Context, order orders.Order) (string, error) {
-	q := `INSERT INTO orders (id, name, price, place, status, metadata, created_at, updated_at)
-		  VALUES (:id, :name, :price, :place, :status, :metadata, :created_at, :updated_at) RETURNING id`
+	q := `INSERT INTO orders (id, vendor, name, price, place, status, metadata, created_at, updated_at)
+		  VALUES (:id, :vendor, :name, :price, :place, :status, :metadata, :created_at, :updated_at) RETURNING id`
 
 	dbo, err := toDBOrder(order)
 	if err != nil {
@@ -50,7 +50,7 @@ func (repo orderRepo) Save(ctx context.Context, order orders.Order) (string, err
 }
 
 func (repo orderRepo) RetrieveByID(ctx context.Context, id string) (orders.Order, error) {
-	q := `SELECT id, name, price, place, status, metadata, created_at, updated_at FROM orders WHERE id = $1`
+	q := `SELECT id, vendor, name, price, place, status, metadata, created_at, updated_at FROM orders WHERE id = $1`
 
 	dbc := dbOrder{
 		ID: id,
@@ -74,6 +74,9 @@ func (repo orderRepo) RetrieveAll(ctx context.Context, pm orders.PageMetadata) (
 	if mq != "" {
 		query = append(query, mq)
 	}
+	if pm.Vendor != "" {
+		query = append(query, fmt.Sprintf("vendor = '%s'", pm.Vendor))
+	}
 	if pm.Name != "" {
 		query = append(query, fmt.Sprintf("name = '%s'", pm.Name))
 	}
@@ -90,7 +93,7 @@ func (repo orderRepo) RetrieveAll(ctx context.Context, pm orders.PageMetadata) (
 		emq = fmt.Sprintf(" WHERE %s", strings.Join(query, " AND "))
 	}
 
-	q := fmt.Sprintf(`SELECT id, name, price, place, status, metadata, created_at, updated_at FROM orders %s ORDER BY created_at LIMIT :limit OFFSET :offset;`, emq)
+	q := fmt.Sprintf(`SELECT id, vendor, name, price, place, status, metadata, created_at, updated_at FROM orders %s ORDER BY created_at LIMIT :limit OFFSET :offset;`, emq)
 	params := map[string]interface{}{
 		"limit":    pm.Limit,
 		"offset":   pm.Offset,
@@ -133,6 +136,9 @@ func (repo orderRepo) RetrieveAll(ctx context.Context, pm orders.PageMetadata) (
 func (repo orderRepo) Update(ctx context.Context, order orders.Order) (string, error) {
 	var query []string
 	var upq string
+	if order.Vendor != "" {
+		query = append(query, "vendor = :vendor,")
+	}
 	if order.Name != "" {
 		query = append(query, "name = :name,")
 	}
@@ -199,6 +205,7 @@ func total(ctx context.Context, db *sqlx.DB, query string, params interface{}) (
 
 type dbOrder struct {
 	ID        string    `db:"id,omitempty"`
+	Vendor    string    `db:"vendor,omitempty"`
 	Name      string    `db:"name,omitempty"`
 	Price     uint64    `db:"price,omitempty"`
 	Place     string    `db:"place,omitempty"`
@@ -219,6 +226,7 @@ func toDBOrder(order orders.Order) (dbOrder, error) {
 	}
 	return dbOrder{
 		ID:        order.ID,
+		Vendor:    order.Vendor,
 		Name:      order.Name,
 		Price:     order.Price,
 		Place:     order.Place,
@@ -238,6 +246,7 @@ func toOrder(order dbOrder) (orders.Order, error) {
 	}
 	return orders.Order{
 		ID:        order.ID,
+		Vendor:    order.Vendor,
 		Name:      order.Name,
 		Price:     order.Price,
 		Place:     order.Place,
