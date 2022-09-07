@@ -38,6 +38,7 @@ func (req viewOrderReq) validate() error {
 
 type listOrdersReq struct {
 	token  string
+	vendor string
 	name   string
 	price  uint64
 	place  string
@@ -60,6 +61,7 @@ func (req listOrdersReq) validate() error {
 type updateOrderReq struct {
 	token    string
 	id       string
+	Vendor   string          `json:"vendor,omitempty"`
 	Name     string          `json:"name,omitempty"`
 	Price    uint64          `json:"price,omitempty"`
 	Place    string          `json:"place,omitempty"`

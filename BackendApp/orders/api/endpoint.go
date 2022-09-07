@@ -38,6 +38,7 @@ func viewOrderEndpoint(svc orders.OrderService) endpoint.Endpoint {
 		}
 		return viewOrderRes{
 			ID:        order.ID,
+			Vendor:    order.Vendor,
 			Name:      order.Name,
 			Price:     order.Price,
 			Place:     order.Place,
@@ -59,6 +60,7 @@ func listOrdersEndpoint(svc orders.OrderService) endpoint.Endpoint {
 			Offset: req.offset,
 			Limit:  req.limit,
 			Total:  req.total,
+			Vendor: req.vendor,
 			Name:   req.name,
 			Price:  req.price,
 			Place:  req.place,
@@ -80,6 +82,7 @@ func updateOrderEndpoint(svc orders.OrderService) endpoint.Endpoint {
 		}
 		order := orders.Order{
 			ID:       req.id,
+			Vendor:   req.Vendor,
 			Name:     req.Name,
 			Price:    req.Price,
 			Place:    req.Place,
@@ -119,6 +122,7 @@ func buildOrdersResponse(op orders.OrdersPage) ordersPageRes {
 	for _, order := range op.Orders {
 		view := viewOrderRes{
 			ID:        order.ID,
+			Vendor:    order.Vendor,
 			Name:      order.Name,
 			Price:     order.Price,
 			Place:     order.Place,

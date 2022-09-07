@@ -20,6 +20,7 @@ type Metadata map[string]interface{}
 // Order this represents the order to be made by a person to the shop.
 type Order struct {
 	ID        string    `json:"id,omitempty"`
+	Vendor    string    `json:"vendor,omitempty"`     // The name of the vendor os the product i.e shop.
 	Name      string    `json:"name,omitempty"`       // The name of the order good.
 	Price     uint64    `json:"price,omitempty"`      // This is the price of the order.
 	Place     string    `json:"place,omitempty"`      // This is the place where the order was served. It is either inhouse or delivery.

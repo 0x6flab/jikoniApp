@@ -59,6 +59,7 @@ func migrateDB(db *sqlx.DB) error {
 				Up: []string{
 					`CREATE TABLE IF NOT EXISTS orders (
 						id 			VARCHAR(254) NOT NULL PRIMARY KEY,
+						vendor 		VARCHAR(254) NOT NULL,
 						name        VARCHAR(254) NOT NULL,
 						price		SMALLINT NOT NULL,
 						place	    VARCHAR(20),
