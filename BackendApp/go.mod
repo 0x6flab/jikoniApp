@@ -8,6 +8,8 @@ require (
 	contrib.go.opencensus.io/integrations/ocsql v0.1.7
 	github.com/go-kit/kit v0.12.0
 	github.com/go-kit/log v0.2.1
+	github.com/golang-jwt/jwt/v4 v4.0.0
+	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/jackc/pgconn v1.13.0
 	github.com/jackc/pgx/v4 v4.17.2
@@ -19,6 +21,7 @@ require (
 	go.opencensus.io v0.23.0
 	go.uber.org/multierr v1.8.0
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f
+	google.golang.org/grpc v1.40.0
 )
 
 require (
@@ -28,7 +31,6 @@ require (
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -49,7 +51,6 @@ require (
 	golang.org/x/sys v0.0.0-20220708085239-5a0f0661e09d // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20210917145530-b395a37504d4 // indirect
-	google.golang.org/grpc v1.40.0 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
