@@ -33,6 +33,9 @@ define make_docker_dev
 		-f docker/Dockerfile.dev ./build
 endef
 
+proto:
+	protoc --gofast_out=plugins=grpc:. auth/*.proto
+
 all: $(SERVICES)
 
 .PHONY: all $(SERVICES) dockers dockers_dev latest release
