@@ -55,22 +55,20 @@ func migrateDB(db *sqlx.DB) error {
 	migrations := &migrate.MemoryMigrationSource{
 		Migrations: []*migrate.Migration{
 			{
-				Id: "orders_1",
+				Id: "shops_1",
 				Up: []string{
-					`CREATE TABLE IF NOT EXISTS orders (
+					`CREATE TABLE IF NOT EXISTS shops (
 						id 			VARCHAR(254) NOT NULL PRIMARY KEY,
-						vendor 		VARCHAR(254) NOT NULL,
-						name        VARCHAR(254) NOT NULL,
-						price		SMALLINT NOT NULL,
-						place	    VARCHAR(20),
-						status      VARCHAR(20),
+						name 		VARCHAR(254) NOT NULL UNIQUE,
+						email       VARCHAR(254) NOT NULL UNIQUE,
+						number	    VARCHAR(20) UNIQUE,
 						metadata    JSONB,
 						created_at  TIMESTAMP DEFAULT now(),
 						updated_at  TIMESTAMP DEFAULT now()
 					)`,
 				},
 				Down: []string{
-					`DROP TABLE IF EXISTS orders`,
+					`DROP TABLE IF EXISTS shops`,
 				},
 			},
 		},

@@ -5,13 +5,13 @@ networks:
     driver: bridge
 
 volumes:
-  0x6flab-jikoni-db-volume:
-
+  0x6flab-jikoni-orders-db-volume:
+  0x6flab-jikoni-shops-db-volume:
 
 services:
-  jikoni-db:
+  jikoni-orders-db:
     image: postgres:13.3-alpine
-    container_name: 0x6flab-jikoni-db
+    container_name: 0x6flab-jikoni-orders-db
     restart: on-failure
     depends_on:
       - jikoni-zipkin
@@ -20,26 +20,46 @@ services:
       POSTGRES_PASSWORD: ${JIKONI_DB_PASS}
       POSTGRES_DB: ${JIKONI_DB}
     ports:
-      - ${JIKONI_DB_PORT}:${JIKONI_DB_PORT}
+      - ${JIKONI_ORDERS_DB_PORT}:${JIKONI_ORDERS_DB_PORT}
     expose:
-      - ${JIKONI_DB_PORT}
+      - ${JIKONI_ORDERS_DB_PORT}
     networks:
       - 0x6flab-jikoni-base-net
     volumes:
-      - 0x6flab-jikoni-db-volume:/var/lib/postgresql/data
-    command: -p ${JIKONI_DB_PORT}
+      - 0x6flab-jikoni-orders-db-volume:/var/lib/postgresql/data
+    command: -p ${JIKONI_ORDERS_DB_PORT}
+
+  jikoni-shops-db:
+    image: postgres:13.3-alpine
+    container_name: 0x6flab-jikoni-shops-db
+    restart: on-failure
+    depends_on:
+      - jikoni-zipkin
+    environment:
+      POSTGRES_USER: ${JIKONI_DB_USER}
+      POSTGRES_PASSWORD: ${JIKONI_DB_PASS}
+      POSTGRES_DB: ${JIKONI_DB}
+    ports:
+      - ${JIKONI_SHOPS_DB_PORT}:${JIKONI_SHOPS_DB_PORT}
+    expose:
+      - ${JIKONI_SHOPS_DB_PORT}
+    networks:
+      - 0x6flab-jikoni-base-net
+    volumes:
+      - 0x6flab-jikoni-shops-db-volume:/var/lib/postgresql/data
+    command: -p ${JIKONI_SHOPS_DB_PORT}
 
   jikoni-orders:
     image: rodneydav/jikoni-orders:${JIKONI_RELEASE_TAG}
     container_name: jikoni-orders
     restart: on-failure
     depends_on:
-      - jikoni-db
+      - jikoni-orders-db
       - jikoni-zipkin
     environment:
       JIKONI_LOG_LEVEL: ${JIKONI_LOG_LEVEL}
-      JIKONI_DB_HOST: ${JIKONI_DB_HOST}
-      JIKONI_DB_PORT: ${JIKONI_DB_PORT}
+      JIKONI_DB_HOST: ${JIKONI_ORDERS_DB_HOST}
+      JIKONI_DB_PORT: ${JIKONI_ORDERS_DB_PORT}
       JIKONI_DB_USER: ${JIKONI_DB_USER}
       JIKONI_DB_PASS: ${JIKONI_DB_PASS}
       JIKONI_DB: ${JIKONI_DB}
@@ -47,17 +67,46 @@ services:
       JIKONI_DB_SSL_CERT: ${JIKONI_DB_SSL_CERT}
       JIKONI_DB_SSL_KEY: ${JIKONI_DB_SSL_KEY}
       JIKONI_DB_SSL_ROOT_CERT: ${JIKONI_DB_SSL_ROOT_CERT}
-      JIKONI_HTTP_PORT: ${JIKONI_HTTP_PORT}
+      JIKONI_ORDERS_HTTP_PORT: ${JIKONI_ORDERS_HTTP_PORT}
       JIKONI_SERVER_CERT: ${JIKONI_SERVER_CERT}
       JIKONI_SERVER_KEY: ${JIKONI_SERVER_KEY}
       JIKONI_ZIPKIN_URL: ${JIKONI_ZIPKIN_URL}
     ports:
-      - ${JIKONI_HTTP_PORT}:${JIKONI_HTTP_PORT}
+      - ${JIKONI_ORDERS_HTTP_PORT}:${JIKONI_ORDERS_HTTP_PORT}
     expose:
-      - ${JIKONI_HTTP_PORT}
+      - ${JIKONI_ORDERS_HTTP_PORT}
     networks:
       - 0x6flab-jikoni-base-net
-  
+
+  jikoni-shops:
+    image: rodneydav/jikoni-shops:${JIKONI_RELEASE_TAG}
+    container_name: jikoni-shops
+    restart: on-failure
+    depends_on:
+      - jikoni-shops-db
+      - jikoni-zipkin
+    environment:
+      JIKONI_LOG_LEVEL: ${JIKONI_LOG_LEVEL}
+      JIKONI_DB_HOST: ${JIKONI_SHOPS_DB_HOST}
+      JIKONI_DB_PORT: ${JIKONI_SHOPS_DB_PORT}
+      JIKONI_DB_USER: ${JIKONI_DB_USER}
+      JIKONI_DB_PASS: ${JIKONI_DB_PASS}
+      JIKONI_DB: ${JIKONI_DB}
+      JIKONI_DB_SSL_MODE: ${JIKONI_DB_SSL_MODE}
+      JIKONI_DB_SSL_CERT: ${JIKONI_DB_SSL_CERT}
+      JIKONI_DB_SSL_KEY: ${JIKONI_DB_SSL_KEY}
+      JIKONI_DB_SSL_ROOT_CERT: ${JIKONI_DB_SSL_ROOT_CERT}
+      JIKONI_SHOPS_HTTP_PORT: ${JIKONI_SHOPS_HTTP_PORT}
+      JIKONI_SERVER_CERT: ${JIKONI_SERVER_CERT}
+      JIKONI_SERVER_KEY: ${JIKONI_SERVER_KEY}
+      JIKONI_ZIPKIN_URL: ${JIKONI_ZIPKIN_URL}
+    ports:
+      - ${JIKONI_SHOPS_HTTP_PORT}:${JIKONI_SHOPS_HTTP_PORT}
+    expose:
+      - ${JIKONI_SHOPS_HTTP_PORT}
+    networks:
+      - 0x6flab-jikoni-base-net
+
   jikoni-zipkin:
     image: openzipkin/zipkin
     container_name: jikoni-zipkin

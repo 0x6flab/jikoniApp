@@ -1,6 +1,6 @@
 JIKONI_DOCKER_IMAGE_NAME_PREFIX ?= rodneydav
 BUILD_DIR = build
-SERVICES = orders
+SERVICES = orders shops
 DOCKERS = $(addprefix docker_,$(SERVICES))
 DOCKERS_DEV = $(addprefix docker_dev_,$(SERVICES))
 CGO_ENABLED ?= 0

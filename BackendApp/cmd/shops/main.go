@@ -10,10 +10,10 @@ import (
 
 	fama "github.com/0x6flab/jikoniApp/BackendApp"
 	"github.com/0x6flab/jikoniApp/BackendApp/internal/errors"
-	"github.com/0x6flab/jikoniApp/BackendApp/orders"
-	ordersapi "github.com/0x6flab/jikoniApp/BackendApp/orders/api"
-	"github.com/0x6flab/jikoniApp/BackendApp/orders/ocmux"
-	"github.com/0x6flab/jikoniApp/BackendApp/orders/postgres"
+	"github.com/0x6flab/jikoniApp/BackendApp/shops"
+	shopsapi "github.com/0x6flab/jikoniApp/BackendApp/shops/api"
+	"github.com/0x6flab/jikoniApp/BackendApp/shops/ocmux"
+	"github.com/0x6flab/jikoniApp/BackendApp/shops/postgres"
 	kitprometheus "github.com/go-kit/kit/metrics/prometheus"
 	kitlog "github.com/go-kit/log"
 	"github.com/gorilla/mux"
@@ -25,10 +25,10 @@ import (
 
 const (
 	stopWaitTime     = 5 * time.Second
-	svcName          = "jikoni-orders"
+	svcName          = "jikoni-shops"
 	defLogLevel      = "error"
 	defDBHost        = "jikoni-db"
-	defDBPort        = "5440"
+	defDBPort        = "5441"
 	defDBUser        = "jikoniuser"
 	defDBPass        = "jikonipass"
 	defDB            = "jikoni"
@@ -50,7 +50,7 @@ const (
 	envDBSSLCert     = "JIKONI_DB_SSL_CERT"
 	envDBSSLKey      = "JIKONI_DB_SSL_KEY"
 	envDBSSLRootCert = "JIKONI_DB_SSL_ROOT_CERT"
-	envHTTPPort      = "JIKONI_ORDERS_HTTP_PORT"
+	envHTTPPort      = "JIKONI_SHOPS_HTTP_PORT"
 	envServerCert    = "JIKONI_SERVER_CERT"
 	envServerKey     = "JIKONI_SERVER_KEY"
 	envZipkinURL     = "JIKONI_ZIPKIN_URL"
@@ -140,11 +140,11 @@ func connectToDB(dbConfig postgres.Config, logger kitlog.Logger) *sqlx.DB {
 	return db
 }
 
-func newService(db *sqlx.DB, logger kitlog.Logger) orders.OrderService {
-	ordersRepo := postgres.NewOrderRepo(db)
-	svc := orders.NewOrderService(ordersRepo)
-	svc = ordersapi.LoggingMiddleware(svc, kitlog.With(logger, "component", svcName))
-	svc = ordersapi.MetricsMiddleware(
+func newService(db *sqlx.DB, logger kitlog.Logger) shops.ShopService {
+	shopsRepo := postgres.NewShopRepo(db)
+	svc := shops.NewShopService(shopsRepo)
+	svc = shopsapi.LoggingMiddleware(svc, kitlog.With(logger, "component", svcName))
+	svc = shopsapi.MetricsMiddleware(
 		svc,
 		kitprometheus.NewCounterFrom(stdprometheus.CounterOpts{
 			Namespace: strings.Replace(svcName, "-", "_", 1),
@@ -162,11 +162,11 @@ func newService(db *sqlx.DB, logger kitlog.Logger) orders.OrderService {
 	return svc
 }
 
-func startHTTPServer(ctx context.Context, svc orders.OrderService, config config, logger kitlog.Logger) error {
+func startHTTPServer(ctx context.Context, svc shops.ShopService, config config, logger kitlog.Logger) error {
 	p := fmt.Sprintf(":%s", config.httpPort)
 	errCh := make(chan error)
 	router := mux.NewRouter()
-	ordersapi.MakeOrdersHandler(svc, router, logger)
+	shopsapi.MakeShopsHandler(svc, router, logger)
 	handler := &ochttp.Handler{Handler: router}
 	server := &http.Server{Addr: p, Handler: handler}
 
